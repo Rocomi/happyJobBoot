@@ -1,0 +1,15 @@
+package kr.happyjob.study.vo.menu;
+
+public class MainMenuVO {
+	private String mnu_id;
+	private String hir_mnu_id;
+	private String mnu_nm;
+	private String mnu_url;
+	private String mnu_dvs_cod;
+	private String grp_num;
+	private String odr;
+	private String lvl;
+	private String mnu_ico_cod;
+	private String use_poa;
+	private String dlt_poa;
+}

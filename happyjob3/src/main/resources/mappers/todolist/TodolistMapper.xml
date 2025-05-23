@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.repository.todolist.TodolistMapper">
+	<!-- 리스트 Mapper -->
+    <select id="todolistList" parameterType="java.util.Map" resultType="kr.happyjob.study.vo.todolist.TodolistModel">
+         SELECT
+             tt.planId,
+             tt.planDate,
+         tt.categoryNm,
+         tt.todoTitle,
+         tt.todoContents,
+         tt.addr,
+         tt.participants,
+         tt.complete,
+         tt.createdAt,
+         tt.updatedAt
+         FROM tb_test_todolist tt
+        <where>
+            <if test ="(todoTitle != null) and (!todoTitle.equals(''))">
+                and  tt.todoTitle like concat('%',#{todoTitle},'%')
+            </if>
+            <if test ="(searchStartDate != null) and (!searchStartDate.equals(''))">
+                and STR_TO_DATE(tt.planDate, '%Y-%m-%d')  <![CDATA[>=]]> STR_TO_DATE(#{searchStartDate}, '%Y-%m-%d')
+            </if>
+            <if test ="(searchEndDate != null) and (!searchEndDate.equals(''))">
+                and STR_TO_DATE(tt.planDate, '%Y-%m-%d')   <![CDATA[<=]]> DATE_ADD(STR_TO_DATE(#{searchEndDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+            </if>
+        </where>
+        ORDER BY STR_TO_DATE(tt.planDate, '%Y-%m-%d')
+        LIMIT #{pageIndex}, #{pageSize}
+    </select>
+
+    <!-- 리스트 Cnt Mapper -->
+    <select id="todoCnt" parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_test_todolist tt
+        <where>
+            <if test ="(todoTitle != null) and (!todoTitle.equals(''))">
+                and  tt.todoTitle like concat('%',#{todoTitle},'%')
+            </if>
+            <if test ="(searchStartDate != null) and (!searchStartDate.equals(''))">
+                and STR_TO_DATE(tt.planDate, '%Y-%m-%d')  <![CDATA[>=]]> STR_TO_DATE(#{searchStartDate}, '%Y-%m-%d')
+            </if>
+            <if test ="(searchEndDate != null) and (!searchEndDate.equals(''))">
+                and STR_TO_DATE(tt.planDate, '%Y-%m-%d')   <![CDATA[<=]]> DATE_ADD(STR_TO_DATE(#{searchEndDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+            </if>
+        </where>
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="selectTodolistInfo" parameterType="java.util.Map" resultType="kr.happyjob.study.vo.todolist.TodolistModel">
+        SELECT
+            tt.planId,
+            tt.planDate,
+            tt.categoryNm,
+            tt.todoTitle,
+            tt.todoContents,
+            tt.addr,
+            tt.participants,
+            tt.complete,
+            tt.createdAt,
+            tt.updatedAt
+        FROM tb_test_todolist tt
+    WHERE tt.planId = #{planId}
+    </select>
+
+    <!-- 일정 추가 -->
+    <insert id="insertTodolistInfo" parameterType="java.util.Map">
+        INSERT INTO tb_test_todolist
+        (
+         planDate,
+         categoryNm,
+         todoTitle,
+         todoContents,
+         addr,
+         participants,
+         complete
+        ) VALUES (
+                  #{planDate},
+                  #{categoryNm},
+                  #{todoTitle},
+                  #{todoContents},
+                  #{addr},
+                  #{participants},
+                  #{complete}
+                         )
+    </insert>
+ <!-- todolist 수정 -->
+    <update id="updateTodolistInfo" parameterType="java.util.Map" >
+        UPDATE tb_test_todolist
+        set
+            planDate = #{planDate},
+            categoryNm = #{categoryNm},
+            todoTitle = #{todoTitle},
+            todoContents = #{todoContents},
+            addr = #{addr},
+            participants =#{participants},
+            complete = #{complete}
+        WHERE planId = #{planId}
+    </update>
+    <!-- todolist 삭제 -->
+    <delete id="deleteTodolistInfo" parameterType="java.util.Map">
+        DELETE FROM tb_test_todolist
+        WHERE planId = #{planId}
+    </delete>
+
+    <!-- todolist 체크박스 처리 -->
+    <update id="todolistComplete" parameterType="java.util.Map" >
+        UPDATE tb_test_todolist
+        set
+            complete = #{complete}
+        WHERE planId = #{planId}
+    </update></mapper>

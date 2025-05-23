@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.repository.shopping.ShoppingMapper">
+	
+   	<!-- 목록 조회 -->
+	<select id = "productlist" parameterType="java.util.Map" resultType = "kr.happyjob.study.vo.Shopping.ShoppingModel">
+        /*kr.happyjob.study.repository.shopping.ShoppingMapper.productlist*/
+		select sp.product_no
+			 ,sp.product_name
+			 ,sp.price
+			 ,sp.free_rate
+			 ,sp.free_price
+			 ,sp.maker
+			 ,sp.best
+			 ,spi.file_name
+			 ,spi.logical_path
+			 ,spi.phygical_path
+			 ,spi.file_size
+			 ,spi.file_ext
+		from tb_shopping_product sp
+				 left outer join (
+			                      select si.product_no
+				                        ,min(si.file_name) as file_name
+				                        ,min(si.logical_path) as logical_path
+				                        ,min(si.phygical_path) as phygical_path
+				                        ,min(si.file_size) as file_size
+				                        ,min(si.file_ext) as file_ext
+			                       from tb_shopping_product_image si
+			                      group by si.product_no
+		                         ) spi on spi.product_no = sp.product_no
+		ORDER BY sp.product_no
+	</select>
+
+	<select id="imagelist" parameterType="java.util.Map" resultType = "kr.happyjob.study.vo.Shopping.ShoppingModel">
+		/*kr.happyjob.study.repository.shopping.ShoppingMapper.productlist*/
+			select file_name
+			from tb_shopping_product_image
+		   where product_no = #{product_no}
+			 and image_type = #{type}
+		ORDER BY file_name
+	</select>
+
+	<!-- 상세 조회 -->
+	<select id = "productdetail" parameterType="java.util.Map" resultType = "kr.happyjob.study.vo.Shopping.ShoppingModel">
+		/*kr.happyjob.study.repository.shopping.ShoppingMapper.productdetail*/
+		select spi.product_no
+			 ,spi.image_type
+			 ,spi.image_seq
+			 ,sp.product_name
+			 ,sp.price
+			 ,sp.free_rate
+			 ,sp.free_price
+			 ,sp.maker
+			 ,spi.file_name
+			 ,spi.logical_path
+			 ,spi.phygical_path
+			 ,spi.file_size
+			 ,spi.file_ext
+		from tb_shopping_product_image spi
+				 inner join tb_shopping_product sp on spi.product_no = sp.product_no
+		where spi.product_no = #{product_no}
+		  and spi.file_name = #{file_name}
+		  and spi.image_type = #{type}
+	</select>
+</mapper>

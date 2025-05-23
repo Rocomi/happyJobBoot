@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.repository.menu.MenuMapper">
+   
+   <select id="mainmenusearch"
+         parameterType="Map"
+         resultType="kr.happyjob.study.vo.menu.MainmenuVO">
+         /* kr.happyjob.study.repository.menu.MenuMapper.mainmenusearch */
+
+        select mnu_id
+              ,hir_mnu_id
+              ,mnu_nm
+              ,mnu_url
+              ,mnu_dvs_cod
+              ,grp_num
+              ,odr
+              ,lvl
+              ,mnu_ico_cod
+              ,use_poa
+              ,dlt_poa 
+         from tm_mnu_mst
+        <where>
+         <if test ="(smenuid != null) and (!smenuid.equals(''))">
+             and mnu_id  Like CONCAT('%', #{smenuid}, '%')
+         </if>
+         <if test ="(smenuname != null) and (!smenuname.equals(''))">
+             and mnu_nm  Like CONCAT('%', #{smenuname}, '%')
+         </if>
+         <if test ="(suseyn != null) and (!suseyn.equals(''))">
+             and use_poa = #{suseyn}
+         </if>   
+         and lvl = #{level}
+       </where>
+       order by hir_mnu_id, mnu_id
+      limit #{pageIndex}, #{pageSize}
+   </select>    
+   
+   <select id="mainmenusearchtotalcnt"
+         parameterType="Map"
+         resultType="int">
+         /* kr.happyjob.study.repository.menu.MenuMapper.mainmenusearchtotalcnt */
+
+        select count(*) as cnt
+         from tm_mnu_mst
+        <where>
+         <if test ="(smenuid != null) and (!smenuid.equals(''))">
+             and mnu_id  Like CONCAT('%', #{smenuid}, '%')
+         </if>
+         <if test ="(smenuname != null) and (!smenuname.equals(''))">
+             and mnu_nm  Like CONCAT('%', #{smenuname}, '%')
+         </if>
+         <if test ="(suseyn != null) and (!suseyn.equals(''))">
+             and use_poa = #{suseyn}
+         </if>   
+         and lvl = #{level}
+       </where>
+   </select>   
+   
+   
+   
+   <select id="submenusearch"
+         parameterType="Map"
+         resultType="kr.happyjob.study.vo.menu.MainmenuVO">
+         /* kr.happyjob.study.repository.menu.MenuMapper.submenusearch */
+
+        select sub.mnu_id
+              ,sub.hir_mnu_id
+              ,(select main.mnu_nm from tm_mnu_mst main where main.mnu_id = sub.hir_mnu_id) as hir_mnu_nm
+              ,sub.mnu_nm
+              ,sub.mnu_url
+              ,sub.mnu_dvs_cod
+              ,sub.grp_num
+              ,sub.odr
+              ,sub.lvl
+              ,sub.mnu_ico_cod
+              ,sub.use_poa
+              ,sub.dlt_poa 
+         from tm_mnu_mst sub
+        where sub.hir_mnu_id = #{smenuid}
+        and sub.lvl = #{level}
+       order by sub.hir_mnu_id, sub.mnu_id
+      limit #{pageIndex}, #{pageSize}
+   </select>    
+   
+   <select id="submenusearchtotalcnt"
+         parameterType="Map"
+         resultType="int">
+         /* kr.happyjob.study.repository.menu.MenuMapper.submenusearchtotalcnt */
+
+        select count(*) as cnt
+          from tm_mnu_mst
+         where hir_mnu_id = #{smenuid}
+         and lvl = #{level}
+   </select>      
+   
+   
+   
+      
+</mapper>
